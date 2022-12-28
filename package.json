@@ -35,6 +35,7 @@
         "typescript": ">=4.4"
     },
     "dependencies": {
-        "fastify": "^4.10.2"
+        "fastify": "^4.10.2",
+        "pino-pretty": "^9.1.1"
     }
 }
