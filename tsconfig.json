@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ESNext",
+        "removeComments": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "strictBindCallApply": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "allowJs": true,
+        "moduleResolution": "node",
+        "strict": true,
+        "outDir": "./dist",
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "experimentalDecorators": true,
+        "lib": ["ES2020.Promise"],
+        "types": ["./node_modules/@types/node"]
+    },
+    "exclude": ["node_modules"]
+}

@@ -1,0 +1,38 @@
+{
+    "name": "whatsapp-api-baileys",
+    "version": "1.0.0",
+    "description": "WhatsApp API Gateway NodeJS using Baileys",
+    "main": "dist/index.js",
+    "scripts": {
+        "lint": "eslint \"src/**/*.{ts,js}\" --fix",
+        "lint:commit": "commitlint -c commitlint.config.js",
+        "format": "prettier . --write",
+        "build:tsc": "tsc -p tsconfig.json",
+        "build": "tsup",
+        "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
+    },
+    "keywords": [
+        "whatsapp",
+        "whatsapp-api",
+        "baileys",
+        "whatsapp-api-gateway"
+    ],
+    "author": "Hanif Dwy Putra S <hanifdwyputrasembiring@gmail.com>",
+    "license": "MIT",
+    "devDependencies": {
+        "@commitlint/cli": "^17.3.0",
+        "@commitlint/config-conventional": "^17.3.0",
+        "@types/node": "^18.11.18",
+        "@typescript-eslint/eslint-plugin": ">=5.43.0",
+        "@typescript-eslint/parser": ">=5.43.0",
+        "conventional-changelog-atom": "^2.0.8",
+        "eslint": ">=8.0.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-config-xo": "^0.43.1",
+        "eslint-config-xo-typescript": "^0.55.1",
+        "husky": "^8.0.2",
+        "prettier": "^2.8.1",
+        "tsup": "^6.5.0",
+        "typescript": ">=4.4"
+    }
+}
