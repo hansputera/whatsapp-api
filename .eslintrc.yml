@@ -1,7 +1,9 @@
 env:
   es2021: true
   node: true
-extends: xo
+extends:
+  - prettier
+  - xo
 overrides:
   - extends:
       - xo-typescript
