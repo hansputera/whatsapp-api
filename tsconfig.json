@@ -20,7 +20,11 @@
         "skipDefaultLibCheck": true,
         "experimentalDecorators": true,
         "lib": ["ES2020.Promise"],
-        "types": ["./node_modules/@types/node"]
+        "types": ["./node_modules/@types/node"],
+        "paths": {
+            "@typings/*": ["./src/@typings/*"]
+        },
+        "baseUrl": "."
     },
     "exclude": ["node_modules"]
 }
