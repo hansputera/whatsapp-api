@@ -23,7 +23,9 @@
         "types": ["./node_modules/@types/node"],
         "paths": {
             "@typings/*": ["./src/@typings/*"],
-            "@managers/*": ["./src/managers/*"]
+            "@managers/*": ["./src/managers/*"],
+            "@controllers/*": ["./src/controllers/*"],
+            "@middlewares/*": ["./src/middlewares/*"]
         },
         "baseUrl": "."
     },
