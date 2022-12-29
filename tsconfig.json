@@ -26,7 +26,8 @@
             "@managers/*": ["./src/managers/*"],
             "@controllers/*": ["./src/controllers/*"],
             "@middlewares/*": ["./src/middlewares/*"],
-            "@services/*": ["./src/services/*"]
+            "@services/*": ["./src/services/*"],
+            "@routers/*": ["./src/routers/*"]
         },
         "baseUrl": "."
     },

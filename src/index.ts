@@ -3,6 +3,7 @@ import fastify from 'fastify';
 import {resolve as pathResolve} from 'node:path';
 
 import {WaWorkerManager} from '@managers/workers-manager';
+import {apiRouter} from '@routers/api.router';
 
 const app = fastify({
     logger: {
@@ -12,6 +13,8 @@ const app = fastify({
     },
     disableRequestLogging: true,
 });
+
+void app.register(apiRouter, {prefix: '/api'});
 
 const waManager = new WaWorkerManager(
     pathResolve(__dirname, 'workers', 'wa-worker.js'),
@@ -26,7 +29,7 @@ app.listen({
     port: parseInt(process.env.PORT ?? '3000', 10),
     host: '0.0.0.0',
 })
-    .then(() => {
+    .then(async () => {
         app.log.info('Ready to serve');
     })
     .catch((e) => {
