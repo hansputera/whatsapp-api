@@ -12,6 +12,8 @@ specifiers:
   eslint-config-xo-typescript: ^0.55.1
   fastify: ^4.10.2
   husky: ^8.0.2
+  nanoid: 3.3.4
+  pino: ^8.8.0
   pino-pretty: ^9.1.1
   prettier: ^2.8.1
   tsup: ^6.5.0
@@ -19,6 +21,8 @@ specifiers:
 
 dependencies:
   fastify: 4.10.2
+  nanoid: 3.3.4
+  pino: 8.8.0
   pino-pretty: 9.1.1
 
 devDependencies:
@@ -2059,6 +2063,12 @@ packages:
       object-assign: 4.1.1
       thenify-all: 1.6.0
     dev: true
+
+  /nanoid/3.3.4:
+    resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+    dev: false
 
   /natural-compare-lite/1.4.0:
     resolution: {integrity: sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g==}

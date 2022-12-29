@@ -36,6 +36,8 @@
     },
     "dependencies": {
         "fastify": "^4.10.2",
+        "nanoid": "3.3.4",
+        "pino": "^8.8.0",
         "pino-pretty": "^9.1.1"
     }
 }
