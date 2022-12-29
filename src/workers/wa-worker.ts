@@ -10,7 +10,22 @@ if (workerThreads.isMainThread) {
     throw new Error("Couldn't run this as main thread!");
 }
 
+const channelPort = workerData.port as MessagePort;
 const sessions: Array<WorkerEvent['0']> = [];
+
+channelPort.on('message', async (m) => {
+    // Signal from worker
+    if (typeof m === 'object' && 'event' in m && 'data' in m) {
+        if (m.event === WaWorkerEvents.FindSession) {
+            const session = sessions.find(
+                (s) => s.sessionId === m.data.sessionId,
+            );
+            if (session) {
+                channelPort.postMessage({data: session});
+            }
+        }
+    }
+});
 
 workerThreads.parentPort?.on('message', async (m) => {
     if (typeof m !== 'object') {
@@ -37,8 +52,7 @@ workerThreads.parentPort?.on('message', async (m) => {
             break;
     }
 
-    const port = workerData.port as MessagePort;
-    port.postMessage({
+    channelPort.postMessage({
         event: WorkerChannelEvents.UpdateSessionLen,
         data: {
             workerId: workerData.id as string,

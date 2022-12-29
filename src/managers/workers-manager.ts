@@ -5,7 +5,7 @@ import {
     WaWorkerEvents,
     WorkerChannelEvents,
 } from '@typings/worker';
-import {MessageChannel, Worker} from 'node:worker_threads';
+import {MessageChannel, MessagePort, Worker} from 'node:worker_threads';
 import {nanoid} from 'nanoid';
 import pino from 'pino';
 
@@ -20,7 +20,11 @@ export class WaWorkerManager {
         };
     }
 
-    public logger = pino({
+    /**
+     * WaWorkerManager logger
+     * @type {pino.Logger}
+     */
+    public logger: pino.Logger = pino({
         name: 'WaWorkerManager',
         transport: {
             target: 'pino-pretty',
@@ -99,7 +103,7 @@ export class WaWorkerManager {
         const waworker = await this.findSpaceWorker();
         const session = await this.#sendAndResolve2Worker({
             event: WaWorkerEvents.FindSession,
-            worker: waworker.worker,
+            worker: this.#channel.port2,
             data: {sessionId},
         }).catch(() => undefined);
 
@@ -142,21 +146,43 @@ export class WaWorkerManager {
         event,
         data,
     }: {
-        worker: Worker;
+        worker: Worker | MessagePort;
         event: E;
         data: Partial<T[E]>;
     }): Promise<WorkerEmit[E]> {
         return new Promise((resolve, reject) => {
+            let noDataTimeout!: NodeJS.Timeout;
             worker.postMessage(WaWorkerManager.buildWorkerData(event, data));
             const callback = (m: WorkerEmit[E]): void => {
+                if (worker instanceof MessagePort && 'event' in m) {
+                    return;
+                }
+
+                if (noDataTimeout) {
+                    clearTimeout(noDataTimeout);
+                }
+
                 worker.off('message', callback);
                 resolve(m);
             };
 
             const callbackErr = (err: Error) => {
+                if (noDataTimeout) {
+                    clearTimeout(noDataTimeout);
+                }
+
                 worker.off('error', callbackErr);
                 reject(err);
             };
+
+            if (worker instanceof MessagePort) {
+                noDataTimeout = setTimeout(() => {
+                    worker.off('message', callback);
+                    worker.off('error', callbackErr);
+
+                    resolve({data: undefined} as WorkerEmit[E]);
+                }, 500);
+            }
 
             worker.on('message', callback);
             worker.on('error', callbackErr);
