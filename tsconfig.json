@@ -23,7 +23,7 @@
         "types": ["./node_modules/@types/node"],
         "paths": {
             "@typings/*": ["./src/@typings/*"],
-            "@utils/*": ["./src/utils/*"]
+            "@managers/*": ["./src/managers/*"]
         },
         "baseUrl": "."
     },
