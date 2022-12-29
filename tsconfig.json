@@ -25,7 +25,8 @@
             "@typings/*": ["./src/@typings/*"],
             "@managers/*": ["./src/managers/*"],
             "@controllers/*": ["./src/controllers/*"],
-            "@middlewares/*": ["./src/middlewares/*"]
+            "@middlewares/*": ["./src/middlewares/*"],
+            "@services/*": ["./src/services/*"]
         },
         "baseUrl": "."
     },
