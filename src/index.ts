@@ -1,4 +1,7 @@
 import fastify from 'fastify';
+import {resolve as pathResolve} from 'node:path';
+
+import {WaWorkerManager} from '@managers/workers-manager';
 
 const app = fastify({
     logger: {
@@ -7,6 +10,15 @@ const app = fastify({
         },
     },
     disableRequestLogging: true,
+});
+
+const waManager = new WaWorkerManager(
+    pathResolve(__dirname, 'workers', 'wa-worker.js'),
+);
+
+app.get('/', async (_, reply) => {
+    const sessiondata = await waManager.add('hello');
+    return reply.send(sessiondata);
 });
 
 app.listen({
