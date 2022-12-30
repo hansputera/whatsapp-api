@@ -14,7 +14,7 @@ const onRequestHandler = async (
     }
 };
 
-export const authRouter = (app: FastifyInstance) => {
+export const authRouter = async (app: FastifyInstance): Promise<void> => {
     app.addHook('onRequest', onRequestHandler);
 
     // Get auth token
