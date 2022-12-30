@@ -1,12 +1,7 @@
 import {createAuthToken, decodeAuthToken} from '@services/jwt';
+import type {AuthPayload} from '@typings/payload';
 import type {FastifyReply, FastifyRequest} from 'fastify';
 import type {JsonWebTokenError} from 'jsonwebtoken';
-
-type AuthPayload = {
-    key: string;
-    iv: string;
-    'idle-time': number;
-};
 
 export const authGetController = async (
     request: FastifyRequest,

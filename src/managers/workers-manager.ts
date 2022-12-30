@@ -2,7 +2,7 @@ import {
     type WorkerEmit,
     type WorkerEvent,
     type WaWorker,
-    WaWorkerEvents,
+    type WaWorkerEvents,
     WorkerChannelEvents,
 } from '@typings/worker';
 import {MessageChannel, MessagePort, Worker} from 'node:worker_threads';
@@ -19,6 +19,8 @@ export class WaWorkerManager {
             data,
         };
     }
+
+    public sendRaw = this.#sendAndResolve2Worker;
 
     /**
      * WaWorkerManager logger
@@ -97,31 +99,15 @@ export class WaWorkerManager {
         return worker;
     }
 
-    public async add(
-        sessionId: string,
-    ): Promise<WorkerEvent[WaWorkerEvents.RegisterSession] | undefined> {
-        const waworker = await this.findSpaceWorker();
-        const session = await this.#sendAndResolve2Worker({
-            event: WaWorkerEvents.FindSession,
-            worker: this.#channel.port2,
-            data: {sessionId},
-        }).catch(() => undefined);
-
-        if (session?.data) {
-            return session.data;
-        }
-
-        const registeredSession = await this.#sendAndResolve2Worker({
-            event: WaWorkerEvents.RegisterSession,
-            worker: waworker.worker,
-            data: {sessionId},
-        });
-
-        if (registeredSession) {
-            return registeredSession.data;
-        }
-
-        return undefined;
+    /**
+     * Get worker
+     * @param {boolean} isPort Do you want get the port?
+     * @return {Promise<WaWorker | MessagePort>}
+     */
+    public async getWorker(isPort = false): Promise<WaWorker | MessagePort> {
+        return isPort
+            ? Promise.resolve(this.#channel.port2)
+            : this.findSpaceWorker();
     }
 
     async #createWorker(): Promise<WaWorker> {
