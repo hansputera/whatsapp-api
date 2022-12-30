@@ -13,7 +13,7 @@ if (workerThreads.isMainThread) {
 const channelPort = workerData.port as MessagePort;
 const sessions: Array<WorkerEvent['0']> = [];
 
-// handle incoming message from port
+// Handle incoming message from port
 channelPort.on('message', async (m) => {
     // Signal from worker
     if (typeof m === 'object' && 'event' in m && 'data' in m) {
@@ -27,7 +27,7 @@ channelPort.on('message', async (m) => {
         }
     }
 });
-//end handle incoming port messages
+// End handle incoming port messages
 
 // handle incoming messages from worker
 workerThreads.parentPort?.on('message', async (m) => {
@@ -63,4 +63,4 @@ workerThreads.parentPort?.on('message', async (m) => {
         },
     });
 });
-// end handle incoming messages from worker
+// End handle incoming messages from worker
