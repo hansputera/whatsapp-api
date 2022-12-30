@@ -9,7 +9,7 @@ const onRequestHandler = async (
     request: FastifyRequest,
     reply: FastifyReply,
 ) => {
-    if (request.method !== 'POST') {
+    if (request.method !== 'GET') {
         await noAuthMiddleware(request, reply);
     }
 };
