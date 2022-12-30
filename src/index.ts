@@ -1,9 +1,8 @@
 import 'dotenv/config';
 import fastify from 'fastify';
-import {resolve as pathResolve} from 'node:path';
 
-import {WaWorkerManager} from '@managers/workers-manager';
 import {apiRouter} from '@routers/api.router';
+import {authRouter} from '@routers/auth.router';
 
 const app = fastify({
     logger: {
@@ -14,17 +13,12 @@ const app = fastify({
     disableRequestLogging: true,
 });
 
+app.log.info('Registering routers');
+
 void app.register(apiRouter, {prefix: '/api'});
+void app.register(authRouter, {prefix: '/auth'});
 
-const waManager = new WaWorkerManager(
-    pathResolve(__dirname, 'workers', 'wa-worker.js'),
-);
-
-app.get('/', async (_, reply) => {
-    const sessiondata = await waManager.add('hello');
-    return reply.send(sessiondata);
-});
-
+app.log.info('Booting up');
 app.listen({
     port: parseInt(process.env.PORT ?? '3000', 10),
     host: '0.0.0.0',
