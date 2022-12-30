@@ -13,6 +13,20 @@ const app = fastify({
     disableRequestLogging: true,
 });
 
+app.addContentTypeParser(
+    'application/json',
+    {
+        parseAs: 'string',
+    },
+    (_, body, done) => {
+        try {
+            done(null, JSON.parse(body.toString('utf8')));
+        } catch (e) {
+            done(e as Error);
+        }
+    },
+);
+
 app.log.info('Registering routers');
 
 void app.register(apiRouter, {prefix: '/api'});
