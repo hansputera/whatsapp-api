@@ -1,4 +1,9 @@
-import {createSession, hasSavedSession} from '@services/sessions.service';
+import {
+    createSession,
+    encryptSessionId,
+    findActiveSession,
+    hasSavedSession,
+} from '@services/sessions.service';
 import type {SessionCreatePayload} from '@typings/payload';
 import {type FastifyReply, type FastifyRequest} from 'fastify';
 
@@ -6,7 +11,7 @@ export const sessionCreateController = async (
     request: FastifyRequest,
     reply: FastifyReply,
 ): Promise<FastifyReply> => {
-    const {sessionId} = request.body as SessionCreatePayload;
+    let {sessionId} = request.body as SessionCreatePayload;
 
     if (sessionId.length < 10 || sessionId.length > 20) {
         return reply.status(400).send({
@@ -14,6 +19,26 @@ export const sessionCreateController = async (
             message:
                 'SessionID(length) should not lower than 10, and higher than 20',
         });
+    }
+
+    const credentials = request.headers['X-Auth']
+        ?.toString()
+        .split('##')
+        .map((d) => Buffer.from(d, 'base64'));
+    if (!credentials) {
+        return reply
+            .status(400)
+            .send({ok: false, message: "Couldn't detect your credentials!"});
+    }
+
+    sessionId = encryptSessionId(sessionId, {
+        key: credentials[0],
+        iv: credentials[1],
+    })!;
+    if (!sessionId) {
+        return reply
+            .status(500)
+            .send({ok: false, message: "Couldn't transform your session id"});
     }
 
     let session = await hasSavedSession(sessionId);
@@ -35,8 +60,8 @@ export const sessionCreateController = async (
         ok: true,
         message: 'Session successfuly generated',
         links: {
-            qr: `/api/sessions/${sessionId}/qr`,
             self: `/api/sessions/${sessionId}`,
+            activate: `/api/sessions/${sessionId}/activate`,
         },
     });
 };
@@ -46,7 +71,27 @@ export const sessionSelfController = async (
     request: FastifyRequest,
     reply: FastifyReply,
 ) => {
-    const {id} = request.params as Record<string, string>;
+    let {id} = request.params as Record<string, string>;
+
+    const credentials = request.headers['X-Auth']
+        ?.toString()
+        .split('##')
+        .map((d) => Buffer.from(d, 'base64'));
+    if (!credentials) {
+        return reply
+            .status(400)
+            .send({ok: false, message: "Couldn't detect your credentials!"});
+    }
+
+    id = encryptSessionId(id, {
+        key: credentials[0],
+        iv: credentials[1],
+    })!;
+    if (!id) {
+        return reply
+            .status(500)
+            .send({ok: false, message: "Couldn't transform your session id"});
+    }
 
     const session = await hasSavedSession(id);
     if (!session) {
@@ -55,5 +100,10 @@ export const sessionSelfController = async (
             .send({ok: false, message: 'Session not found'});
     }
 
-    return reply.status(200).send({ok: true});
+    const activeSession = await findActiveSession(id);
+
+    return reply.status(200).send({
+        ok: true,
+        data: {session: activeSession ?? null, exists: session},
+    });
 };
