@@ -1,6 +1,7 @@
 import {
     sessionActivateController,
     sessionCreateController,
+    sessionQrController,
     sessionSelfController,
 } from '@controllers/sessions.controller';
 import {authMiddleware} from '@middlewares/auth.middleware';
@@ -48,6 +49,18 @@ export const apiRouter = async (app: FastifyInstance): Promise<void> => {
     // Activate session
     app.post('/sessions/:id/activate', {
         handler: sessionActivateController,
+        schema: {
+            params: {
+                id: {
+                    type: 'string',
+                },
+            },
+        },
+    });
+
+    // QR session resource
+    app.get('/sessions/:id/qr', {
+        handler: sessionQrController,
         schema: {
             params: {
                 id: {

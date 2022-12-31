@@ -8,6 +8,7 @@ import {
 } from '@services/sessions.service';
 import type {SessionCreatePayload} from '@typings/payload';
 import {type FastifyReply, type FastifyRequest} from 'fastify';
+import {image as qrImage} from 'qr-image';
 
 export const sessionActivateController = async (
     request: FastifyRequest,
@@ -71,7 +72,58 @@ export const sessionActivateController = async (
 
     return reply
         .status(activateServiceMessage.startsWith('Error') ? 500 : 200)
-        .send({ok: true, message: activateServiceMessage});
+        .send({
+            ok: true,
+            message: activateServiceMessage,
+            links: {
+                self: `/api/sessions/${id}`,
+                qr: `/api/sessions/${id}/qr`,
+                activate: `/api/sessions/${id}/activate`,
+            },
+        });
+};
+
+export const sessionQrController = async (
+    request: FastifyRequest,
+    reply: FastifyReply,
+): Promise<FastifyReply> => {
+    let {id} = request.params as Record<string, string>;
+
+    const credentials = request.headers['X-Auth']
+        ?.toString()
+        .split('##')
+        .map((d) => Buffer.from(d, 'base64'));
+    if (!credentials) {
+        return reply
+            .status(400)
+            .send({ok: false, message: "Couldn't detect your credentials!"});
+    }
+
+    id = encryptSessionId(id, {
+        key: credentials[0],
+        iv: credentials[1],
+    })!;
+    if (!id) {
+        return reply
+            .status(500)
+            .send({ok: false, message: "Couldn't transform your session id"});
+    }
+
+    const session = await hasSavedSession(id);
+    if (!session) {
+        return reply
+            .status(404)
+            .send({ok: false, message: 'Session not found'});
+    }
+
+    const activeSession = await findActiveSession(id);
+    if (activeSession?.qr && activeSession.state === 'prepare') {
+        return reply.status(200).send(qrImage(activeSession.qr, {type: 'png'}));
+    }
+
+    return reply
+        .status(503)
+        .send({ok: false, message: 'QR is not available for this session'});
 };
 
 export const sessionCreateController = async (
@@ -129,6 +181,7 @@ export const sessionCreateController = async (
         links: {
             self: `/api/sessions/${sessionId}`,
             activate: `/api/sessions/${sessionId}/activate`,
+            qr: `/api/sessions/${sessionId}/qr`,
         },
     });
 };
@@ -172,5 +225,10 @@ export const sessionSelfController = async (
     return reply.status(200).send({
         ok: true,
         data: {session: activeSession ?? null, exists: session},
+        links: {
+            self: `/api/sessions/${id}`,
+            qr: `/api/sessions/${id}/qr`,
+            activate: `/api/sessions/${id}/activate`,
+        },
     });
 };
