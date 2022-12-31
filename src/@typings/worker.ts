@@ -30,7 +30,7 @@ export type WorkerEmit = {
         data?: WorkerEvent[WaWorkerEvents.RegisterSession];
     };
     [WaWorkerEvents.ActivateClient]: {
-        data?: Omit<WorkerEvent[WaWorkerEvents.ActivateClient], 'key' | 'iv'>;
+        data?: {message?: string; error?: string};
     };
 };
 export type WaWorker = {

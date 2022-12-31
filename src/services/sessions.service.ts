@@ -1,5 +1,5 @@
 import {appWorkerManager} from '@root/app-worker';
-import {WaWorkerEvents} from '@typings/worker';
+import {type WaWorker, WaWorkerEvents} from '@typings/worker';
 import {createCipheriv} from 'node:crypto';
 
 import {stat, mkdir} from 'node:fs/promises';
@@ -22,6 +22,36 @@ export const encryptSessionId = (
     ]);
 
     return encrypted.toString('hex');
+};
+
+export const activateSession = async (
+    id: string,
+    idle: number,
+    credentials: Types.GeneratedKey,
+): Promise<string | undefined> => {
+    const worker = await appWorkerManager.getWorker(false);
+    const session = await appWorkerManager.sendRaw({
+        worker: (worker as WaWorker).worker,
+        event: WaWorkerEvents.ActivateClient,
+        data: {
+            iv: credentials.iv.toString('base64'),
+            key: credentials.key.toString('base64'),
+            qr: undefined,
+            idle,
+            state: 'offline',
+            sessionId: id,
+        },
+    });
+
+    if (!session.data) {
+        return undefined;
+    }
+
+    if (session.data.error) {
+        return 'Error: '.concat(session.data.error);
+    }
+
+    return session.data.message;
 };
 
 export const findActiveSession = async (id: string) => {

@@ -1,4 +1,5 @@
 import {
+    sessionActivateController,
     sessionCreateController,
     sessionSelfController,
 } from '@controllers/sessions.controller';
@@ -35,6 +36,18 @@ export const apiRouter = async (app: FastifyInstance): Promise<void> => {
     // Self session
     app.get('/sessions/:id', {
         handler: sessionSelfController,
+        schema: {
+            params: {
+                id: {
+                    type: 'string',
+                },
+            },
+        },
+    });
+
+    // Activate session
+    app.post('/sessions/:id/activate', {
+        handler: sessionActivateController,
         schema: {
             params: {
                 id: {

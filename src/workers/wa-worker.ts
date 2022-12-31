@@ -28,6 +28,7 @@ const transformSessionToMessage = (
               sessionId: options.sessionId,
               idle: options.idle,
               state: options.state,
+              qr: options.qr,
           }
         : undefined;
 

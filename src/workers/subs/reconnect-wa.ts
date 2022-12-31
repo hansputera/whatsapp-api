@@ -4,16 +4,25 @@ import {type Types, useSafeMultiAuthState} from 'safe-usemultiauthstate';
 import type {Boom} from '@hapi/boom';
 import {removeSessionDirectory} from './utils-wa';
 import type {EventEmitter} from 'node:stream';
+import pino from 'pino';
 
 export const createWaClient = async (
     key: Types.GeneratedKey,
     sessionDir: string,
+    id: string,
 ): Promise<{
     client: SessionClient;
     state: Awaited<ReturnType<typeof useSafeMultiAuthState>>;
 }> => {
     const state = await useSafeMultiAuthState(key, sessionDir);
-    const client = makeWASocket({auth: state.state});
+    const client = makeWASocket({
+        auth: state.state,
+        logger: pino({
+            name: 'session-'.concat(id),
+            level: 'info',
+            transport: {target: 'pino-pretty'},
+        }),
+    });
 
     return {client, state};
 };
@@ -64,6 +73,7 @@ export const reconnectWaHandler = async (
         const {client: _client, state} = await createWaClient(
             session.key,
             session.dir,
+            session.id,
         );
 
         client = _client;
